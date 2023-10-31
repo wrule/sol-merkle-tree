@@ -4,9 +4,8 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
 contract X {
-
-  function a() external {
-    // MerkleProof.
+  function verify(bytes32[] memory proof, bytes32 root, bytes32 leaf) external pure returns (bool) {
+    return MerkleProof.verify(proof, root, leaf);
   }
 
   event sendMessageEvent(string message);
