@@ -12,22 +12,41 @@ function hashPair(hash1: string, hash2: string) {
   return ethers.keccak256(pair);
 }
 
-function keccak256(message: string | CryptoJS.lib.WordArray) {
-  return SHA3(message, { outputLength: 256 });
+class OpenZeppelinMerleTree {
+  public constructor(data: string[]) {
+    this.tree = new MerkleTree(data, ethers.keccak256, {
+      sortPairs: true,
+      hashLeaves: true,
+    });
+    this._root = '0x' + this.tree.getRoot().toString('hex');
+  }
+
+  private tree!: MerkleTree;
+  private _root = '';
+
+  public get Root() { return this._root; }
+
+  public getProof(item: string) {
+    return this.tree.getProof(ethers.keccak256(item)).map((route) => '0x' + route.data.toString('hex'));
+  }
+
+  public verify(item: string, proof: string[]) {
+    return this.tree.verify(proof, ethers.keccak256(item), this.Root);
+  }
 }
 
 async function main() {
   await meta();
-
-  const leaves = ['a', 'b', 'c'].map(x => keccak256(x));
-  const tree = new MerkleTree(leaves, keccak256);
-  const root = tree.getRoot().toString('hex')
-  const leaf = keccak256('a').toString();
-  const proof = tree.getProof(leaf);
-  console.log(tree.verify(proof, leaf, root));
-
-  // console.log(keccak256('a').toString());
-  // console.log(ethers.keccak256(ethers.toUtf8Bytes('a')));
+  const data = [
+    '0x5B38Da6a701c568545dCfcB03FcB875f56beddC4',
+    '0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2',
+    '0x4B20993Bc481177ec7E8f571ceCaE8A9e22C02db',
+    '0x78731D3Ca6b7E34aC0F824c42a7cC18A495cabaB',
+  ];
+  const tree = new OpenZeppelinMerleTree(data);
+  console.log(tree.Root);
+  const proof = tree.getProof('0x5B38Da6a701c568545dCfcB03FcB875f56beddC4');
+  console.log(tree.verify('0x5B38Da6a701c568545dCfcB03FcB875f56beddC4', proof));
 }
 
 async function dev() {
