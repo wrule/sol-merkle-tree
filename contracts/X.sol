@@ -1,7 +1,14 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.20;
 
+import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
+
 contract X {
+
+  function a() external {
+    // MerkleProof.
+  }
+
   event sendMessageEvent(string message);
   function sendMessage(string memory message) public {
     emit sendMessageEvent(message);
