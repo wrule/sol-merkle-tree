@@ -28,7 +28,7 @@ class OpenZeppelinMerleTree {
     return '0x' + buffer.toString('hex');
   }
 
-  private smartKeccak256(data: BytesLike) {
+  public smartKeccak256(data: BytesLike) {
     if (typeof data !== 'string' || data.startsWith('0x')) return ethers.keccak256(data);
     return ethers.keccak256(ethers.toUtf8Bytes(data));
   }
@@ -51,11 +51,16 @@ async function main() {
     '0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2',
     '0x4B20993Bc481177ec7E8f571ceCaE8A9e22C02db',
     '0x78731D3Ca6b7E34aC0F824c42a7cC18A495cabaB',
+    '鸡毛',
+    '装修',
   ];
   const tree = new OpenZeppelinMerleTree(data);
-  console.log(tree.Root);
-  const proof = tree.getProof('即使是');
-  console.log(tree.verify('即使是', proof));
+  const root = tree.Root;
+  const leaf = '鸡毛';
+  const proof = tree.getProof(leaf);
+  const x = await deployContract<X>('X');
+  const a = await x.verify(proof, root, tree.smartKeccak256(leaf));
+  console.log(a);
 }
 
 async function dev() {
