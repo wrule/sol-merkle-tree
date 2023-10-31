@@ -18,16 +18,20 @@ class OpenZeppelinMerleTree {
       sortPairs: true,
       hashLeaves: true,
     });
-    this._root = '0x' + this.tree.getRoot().toString('hex');
+    this._root = this.bufferString(this.tree.getRoot());
   }
 
   private tree!: MerkleTree;
   private _root = '';
 
+  private bufferString(buffer: Buffer) {
+    return '0x' + buffer.toString('hex');
+  }
+
   public get Root() { return this._root; }
 
   public getProof(item: string) {
-    return this.tree.getProof(ethers.keccak256(item)).map((route) => '0x' + route.data.toString('hex'));
+    return this.tree.getProof(ethers.keccak256(item)).map((route) => this.bufferString(route.data));
   }
 
   public verify(item: string, proof: string[]) {
